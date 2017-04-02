@@ -1,0 +1,30 @@
+class LegResult
+  include Mongoid::Document
+
+  field :secs, type: Float
+
+  embedded_in :entrant
+  embeds_one :event, class_name: 'Event', as: :parent
+
+  validates_presence_of :event
+
+  def calc_ave
+  end
+
+  after_initialize do |doc|
+    calc_ave
+  end
+
+  def secs= value
+    self[:secs] = value
+    calc_ave
+  end
+
+  after_create do |doc|
+    if entrant
+      doc.entrant.update_total(doc)
+    end
+  end
+
+
+end
